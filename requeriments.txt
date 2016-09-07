@@ -1,0 +1,22 @@
+If you are on Debian / Ubuntu, install using the following:
+
+Install pip3 command needed to install newspaper3k package:
+
+$ sudo apt-get install python3-pip
+Python development version, needed for Python.h:
+
+$ sudo apt-get install python-dev
+lxml requirements:
+
+$ sudo apt-get install libxml2-dev libxslt-dev
+For PIL to recognize .jpg images:
+
+$ sudo apt-get install libjpeg-dev zlib1g-dev libpng12-dev
+Install the distribution via pip:
+
+$ pip3 install newspaper3k
+Download NLP related corpora:
+
+$ curl https://raw.githubusercontent.com/codelucas/newspaper/master/download_corpora.py | python3
+
+
