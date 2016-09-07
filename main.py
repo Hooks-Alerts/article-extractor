@@ -70,8 +70,7 @@ def getHTMLText2(article, limit_bytes = 2048):
         return "";
     s = "";
     s += "<h1>"+article.title+"</h1>"
-    allowed_tags = ["p", "pre", "ol", "li"]
-    
+   
     s = BeautifulSoup(s+article.article_html, 'lxml')
 
     for tag in s.findAll(True): 
