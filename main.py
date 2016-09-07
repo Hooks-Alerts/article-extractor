@@ -50,14 +50,7 @@ def article_extract():
             }
         return jsonify(**ret), 500  
 
-def getParagraphs(article, limit_bytes=2048):
-    if article.text == '': 
-        return [];
-    truncated_article = unicode_truncate(article.text, 2048)
-    paragraphs = truncated_article.split("\n\n");
 
-    return paragraphs
-    
 def getHTMLText(article, limit_bytes = 2048):
     if article.text == '': 
         return "";
@@ -105,5 +98,4 @@ def _remove_attrs(html_text):
 
 if __name__ == "__main__":
     app.run()
-else: 
-    hello()
+
