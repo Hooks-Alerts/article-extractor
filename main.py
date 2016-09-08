@@ -39,7 +39,7 @@ def article_extract():
             "elapsed":elapsed,
             "data":d
         }
-        return jsonify(**ret), 207    
+        return jsonify(**ret), 200    
 
     except:
         raise
@@ -83,7 +83,8 @@ def getHTMLText2(article, limit_bytes = 2048):
     
     s = BeautifulSoup(s, 'lxml')
 
-    return s.prettify()[17:-17];
+    s = s.prettify()[17:-17];
+    return re.sub("\n+\s*", "", s)
     #return s
     
 def unicode_truncate(s, length, encoding='utf-8'):
