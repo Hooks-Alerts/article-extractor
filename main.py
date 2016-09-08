@@ -2,6 +2,8 @@ from newspaper import Article
 from flask import Flask
 from flask import request
 from flask import jsonify
+from flask import render_template
+
 from bs4 import BeautifulSoup
 import time
 import cgi
@@ -12,9 +14,30 @@ import re
 app = Flask(__name__)
 
 @app.route("/v1/extract")
-def article_extract():
-    start = time.time()
+
+def extract():
     url = request.args.get("url")
+    hook_id = request.args.get("hook_id")
+    ret, error_code = processArticle(url, hook_id)
+    return jsonify(**ret), error_code  
+
+@app.route("/v1/display")
+def display():
+    url = request.args.get("url")
+    hook_id = request.args.get("hook_id")
+    ret, error_code = processArticle(url, hook_id)
+    if ret['data']['text_html']=="": 
+        return "Not readable content",500
+    return render_template("webview.html", body = ret['data']['text_html'], hook_id = hook_id, css = "CSS")
+
+@app.route("/v1/css")
+def css():
+    return render_template("style.css"), 200, {'Content-Type': 'text/css; charset=utf-8'}
+
+
+def processArticle(url, hook_id):
+    start = time.time()
+    
     try:
   
         article = Article(url, keep_article_html=True)
@@ -39,7 +62,7 @@ def article_extract():
             "elapsed":elapsed,
             "data":d
         }
-        return jsonify(**ret), 200    
+        return ret, 200    
 
     except:
         raise
@@ -48,7 +71,7 @@ def article_extract():
             "status":"ERROR",
             "elapsed":elapsed
             }
-        return jsonify(**ret), 500  
+        return ret, 500  
 
 
 def getHTMLText(article, limit_bytes = 2048):
@@ -95,6 +118,9 @@ def _remove_attrs(html_text):
     for tag in soup.findAll(True): 
         tag.attrs = {}
     return soup
+
+
+
 
 if __name__ == "__main__":
     app.run()

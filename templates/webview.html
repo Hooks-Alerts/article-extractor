@@ -1,0 +1,16 @@
+{% autoescape false %}
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset = "utf-8">
+		<title></title>
+		<style>
+{% include 'style.css' %}
+        </style>
+	</head>
+ 
+	<body class="body-hookid-{{ hook_id }}">
+    {{ body }}
+	</body>
+</html>
+{% endautoescape %}
