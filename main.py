@@ -9,14 +9,13 @@ import time
 import cgi
 import re
 
-
-
 app = Flask(__name__)
 
 @app.route("/v1/extract")
-
 def extract():
+
     url = request.args.get("url")
+    url = url if "://" in url else "http://" + url
     hook_id = request.args.get("hook_id")
     ret, error_code = processArticle(url, hook_id)
     return jsonify(**ret), error_code  
@@ -34,16 +33,16 @@ def display():
 def css():
     return render_template("style.css"), 200, {'Content-Type': 'text/css; charset=utf-8'}
 
-
 def processArticle(url, hook_id):
     start = time.time()
     
     try:
-  
+       
         article = Article(url, keep_article_html=True)
         article.download()
         article.parse()
-        article.nlp()
+
+        #article.nlp()
         
         d = {
             "is_readable": article.text != '',
@@ -52,7 +51,8 @@ def processArticle(url, hook_id):
             "summary": article.summary,
             "keywords": article.keywords,
             "text_html": getHTMLText2(article, 2048),
-            "url": article.url
+            "url": article.url,
+            "amp_url": extract_amp_url(article.html)
           
             }
         elapsed = time.time() - start
@@ -64,7 +64,7 @@ def processArticle(url, hook_id):
         }
         return ret, 200    
 
-    except:
+    except Exception:
         raise
         elapsed = time.time() - start
         ret = {
@@ -72,7 +72,6 @@ def processArticle(url, hook_id):
             "elapsed":elapsed
             }
         return ret, 500  
-
 
 def getHTMLText(article, limit_bytes = 2048):
     if article.text == '': 
@@ -119,7 +118,28 @@ def _remove_attrs(html_text):
         tag.attrs = {}
     return soup
 
+def  extract_amp_url(html): 
+    soup = BeautifulSoup(html, 'html.parser')
+    element = soup.find('link', attrs={'rel': 'amphtml'})
+    if element:
+        try:
+            href = element['href']
+        except ValueError:
+            # In case there are not enough values to unpack
+            # for instance: <meta http-equiv="refresh" content="600" />
+            return None
+        else:
+            return href
 
+
+@app.errorhandler(500)
+def internal_error(error):
+    return  '{ "status":"ERROR", "message":"INTERNAL"}', 500
+
+
+@app.errorhandler(404)
+def notfound_error(error):
+    return  '{ "status":"ERROR", "message":"NOT_FOUND" }', 400
 
 
 if __name__ == "__main__":
