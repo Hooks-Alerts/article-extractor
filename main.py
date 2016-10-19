@@ -3,7 +3,7 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 from flask import render_template
-
+from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 import time
 import cgi
@@ -52,7 +52,7 @@ def processArticle(url, hook_id):
             "keywords": article.keywords,
             "text_html": getHTMLText2(article, 2048),
             "url": article.url,
-            "amp_url": extract_amp_url(article.html)
+            "amp_url": extract_amp_url(article)
           
             }
         elapsed = time.time() - start
@@ -118,8 +118,10 @@ def _remove_attrs(html_text):
         tag.attrs = {}
     return soup
 
-def  extract_amp_url(html): 
-    soup = BeautifulSoup(html, 'html.parser')
+def  extract_amp_url(article): 
+
+    soup = BeautifulSoup(article.html, 'html.parser')
+    
     element = soup.find('link', attrs={'rel': 'amphtml'})
     if element:
         try:
@@ -129,7 +131,9 @@ def  extract_amp_url(html):
             # for instance: <meta http-equiv="refresh" content="600" />
             return None
         else:
-            return href
+            return href if not href.startswith('//') else ((urlparse(article.url).scheme)+":"+href)
+            
+
 
 
 @app.errorhandler(500)
