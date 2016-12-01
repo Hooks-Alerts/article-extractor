@@ -50,7 +50,7 @@ def processArticle(url, hook_id):
             "top_image": article.top_image,
             "summary": article.summary,
             "keywords": article.keywords,
-            "text_html": getHTMLText2(article, 2048),
+            "text_html": getHTMLText2(article, 1024),
             "url": article.url,
             "amp_url": extract_amp_url(article)
           
@@ -81,7 +81,7 @@ def getHTMLText(article, limit_bytes = 2048):
     s += "<p>"
     
     s += re.sub("\n+", "</p><p>", article.text)
-    s = unicode_truncate(s,2048)
+    s = unicode_truncate(s,limit_bytes)
     s += "</p>"
 
     return s
@@ -101,7 +101,7 @@ def getHTMLText2(article, limit_bytes = 2048):
             tag.extract()
 
     s=s.prettify()
-    s = unicode_truncate(s,2048)
+    s = unicode_truncate(s,limit_bytes)
     
     s = BeautifulSoup(s, 'lxml')
 
