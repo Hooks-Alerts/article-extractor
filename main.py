@@ -50,7 +50,7 @@ def processArticle(url, hook_id):
             "top_image": article.top_image,
             "summary": article.summary,
             "keywords": article.keywords,
-            "text_html": getHTMLText2(article, 1024),
+            "text_html": getHTMLText2(article, 768),
             "url": article.url,
             "amp_url": extract_amp_url(article)
           
